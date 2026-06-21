@@ -1,0 +1,15 @@
+# ROS / catkin build output
+build/
+devel/
+install/
+logs/
+*.o
+
+# Editor / IDE
+.vscode/
+.idea/
+*.swp
+*~
+
+# macOS
+.DS_Store
