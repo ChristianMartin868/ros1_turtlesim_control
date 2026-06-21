@@ -1,51 +1,54 @@
 # ros1_turtlesim_control
 
-ROS-1-Node, mit der `turtle2` der `turtle1` in `turtlesim` folgt. Studienprojekt
-aus dem Modul *Autonome Systeme* (2020).
+ROS 1 node that makes `turtle2` follow `turtle1` in `turtlesim`. Study project
+from the *Autonomous Systems* module (2020).
 
-> Verwendet die **ROS 1**-API (`ros/ros.h`, `ros::NodeHandle`, `ros::Rate`,
-> `subscribe`/`advertise`). Ausgelegt für ROS 1 (catkin).
+> Uses the **ROS 1** API (`ros/ros.h`, `ros::NodeHandle`, `ros::Rate`,
+> `subscribe`/`advertise`). Targets ROS 1 (catkin).
 
-## Funktionsweise
+## How it works
 
 `src/turtle_control_node.cpp`:
 
-- Abonniert die Posen beider Schildkröten: `turtle1/pose`, `turtle2/pose`
+- Subscribes to the poses of both turtles: `turtle1/pose`, `turtle2/pose`
   (`turtlesim/Pose`).
-- Berechnet pro Iteration:
-  - **Abstand** `dabs = sqrt(dx² + dy²)` zwischen beiden Schildkröten,
-  - **Winkeldifferenz** `deltaTheta = atan2(dy, dx) − theta2`.
-- Veröffentlicht `geometry_msgs/Twist` auf `turtle2/cmd_vel`:
-  - Lineargeschwindigkeit `0.1 · dabs`,
-  - Winkelgeschwindigkeit `0.5 · deltaTheta`.
-- **Stoppschwelle:** bei `dabs < 0.8` wird die Vorwärtsbewegung auf 0 gesetzt,
-  damit `turtle2` nicht in `turtle1` hineinfährt.
-- Läuft mit 1 Hz (`ros::Rate(1)`).
+- Computes per iteration:
+  - **distance** `dabs = sqrt(dx² + dy²)` between the two turtles,
+  - **heading difference** `deltaTheta = atan2(dy, dx) − theta2`.
+- Publishes `geometry_msgs/Twist` on `turtle2/cmd_vel`:
+  - linear velocity `0.1 · dabs`,
+  - angular velocity `0.5 · deltaTheta`.
+- **Stop threshold:** when `dabs < 0.8` the forward motion is set to 0, so
+  `turtle2` does not drive into `turtle1`.
+- Runs at 1 Hz (`ros::Rate(1)`).
 
 ## Topics
 
-| Richtung | Topic            | Typ                   |
-|----------|------------------|-----------------------|
-| sub      | `turtle1/pose`   | `turtlesim/Pose`      |
-| sub      | `turtle2/pose`   | `turtlesim/Pose`      |
-| pub      | `turtle2/cmd_vel`| `geometry_msgs/Twist` |
+| Direction | Topic            | Type                  |
+|-----------|------------------|-----------------------|
+| sub       | `turtle1/pose`   | `turtlesim/Pose`      |
+| sub       | `turtle2/pose`   | `turtlesim/Pose`      |
+| pub       | `turtle2/cmd_vel`| `geometry_msgs/Twist` |
 
-## Bauen & Ausführen
+## Build & run
 
-Die Datei ist ein Auszug und enthält keine Build-Konfiguration. Für eine
-lauffähige Umgebung in ein catkin-Package einbinden:
+The file is an excerpt and contains no build configuration. For a runnable
+setup, add it to a catkin package:
 
 ```bash
-# in einem catkin-Workspace, Package mit CMakeLists.txt + package.xml anlegen,
-# turtle_control_node.cpp als Node-Target hinzufügen, dann:
+# in a catkin workspace, create a package with CMakeLists.txt + package.xml,
+# add turtle_control_node.cpp as a node target, then:
 catkin_make
 source devel/setup.bash
 
-# turtlesim starten und zweite Schildkröte spawnen:
+# start turtlesim and spawn a second turtle:
 rosrun turtlesim turtlesim_node
 rosservice call /spawn 2 2 0 turtle2
 
-rosrun <dein_package> turtle_control_node
+rosrun <your_package> turtle_control_node
 ```
 
-Abhängigkeiten: ROS 1 mit `turtlesim`, `geometry_msgs`.
+Dependencies: ROS 1 with `turtlesim`, `geometry_msgs`.
+
+> A ROS 2 port is available at
+> [`ros2_turtlesim_control`](https://github.com/ChristianMartin868/ros2_turtlesim_control).
